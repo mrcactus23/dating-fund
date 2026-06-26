@@ -295,54 +295,79 @@
 
 </div>
 
-<script>
-const KEY_BUDGET = 'df_budget';
-const KEY_EXPS = 'df_expenses';
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 🔧 STEP: paste your own Firebase project config here (see setup guide)
+const firebaseConfig = {
+  apiKey: "AIzaSyDHkRWjx6-1YmrxQXydga2_-Ib4_IxYlCs",
+  authDomain: "test-3b44c.firebaseapp.com",
+  projectId: "test-3b44c",
+  storageBucket: "test-3b44c.firebasestorage.app",
+  messagingSenderId: "191063864532",
+  appId: "1:191063864532:web:9b370edae7ecf8aa383741",
+  measurementId: "G-N7NB6Q9TRH"
+};
 
 let budget = 0;
 let expenses = [];
-let storageOk = true;
+let docRef = null;
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function fmt(n){ return 'RM ' + (Math.round(n*100)/100).toFixed(2); }
 function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
-async function storeGet(key){
-  try{
-    const res = await window.storage.get(key, false);
-    return res ? JSON.parse(res.value) : null;
-  }catch(e){ return null; }
+function showBanner(msg){
+  const b = document.getElementById('storageBanner');
+  b.textContent = msg;
+  b.style.display = 'block';
 }
-async function storeSet(key, val){
-  try{
-    const res = await window.storage.set(key, JSON.stringify(val), false);
-    if(!res){ storageOk = false; updateBanner(); }
-  }catch(e){ storageOk = false; updateBanner(); }
+function hideBanner(){
+  document.getElementById('storageBanner').style.display = 'none';
 }
-function updateBanner(){
-  document.getElementById('storageBanner').style.display = storageOk ? 'none' : 'block';
+
+async function writeData(){
+  if(!docRef) return;
+  try{
+    await setDoc(docRef, { budget, expenses }, { merge: true });
+  }catch(e){
+    showBanner('⚠ Could not sync — check your connection.');
+  }
 }
 
 async function init(){
   document.getElementById('expDate').value = todayStr();
-  const b = await storeGet(KEY_BUDGET);
-  const e = await storeGet(KEY_EXPS);
-  budget = (typeof b === 'number') ? b : 0;
-  expenses = e || [];
-
-  if(budget === 0 && expenses.length === 0){
-    const val = prompt('Set your monthly dating budget (RM):', '500');
-    const num = parseFloat(val);
-    if(!isNaN(num) && num >= 0){
-      budget = num;
-      await storeSet(KEY_BUDGET, budget);
-    }
-  }
-
-  renderAll();
-
   document.getElementById('editAllocBtn').addEventListener('click', editBudget);
   document.getElementById('addExpBtn').addEventListener('click', addExpense);
+
+  try{
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    docRef = doc(db, 'datefund', 'shared');
+
+    onSnapshot(docRef, (snap) => {
+      hideBanner();
+      if(snap.exists()){
+        const data = snap.data();
+        budget = typeof data.budget === 'number' ? data.budget : 0;
+        expenses = Array.isArray(data.expenses) ? data.expenses : [];
+        renderAll();
+      } else {
+        const val = prompt('Set your monthly dating budget (RM):', '500');
+        const num = parseFloat(val);
+        budget = (!isNaN(num) && num >= 0) ? num : 0;
+        expenses = [];
+        renderAll();
+        writeData();
+      }
+    }, () => {
+      showBanner('⚠ Could not connect — check your Firebase config.');
+    });
+  }catch(e){
+    showBanner('⚠ Sync not set up yet — add your Firebase keys in the code.');
+    renderAll();
+  }
 }
 
 function renderAll(){
@@ -406,8 +431,8 @@ async function editBudget(){
   const num = parseFloat(val);
   if(isNaN(num) || num < 0) return;
   budget = num;
-  await storeSet(KEY_BUDGET, budget);
   renderAll();
+  writeData();
 }
 
 async function addExpense(){
@@ -419,15 +444,15 @@ async function addExpense(){
   const date = dateEl.value || todayStr();
   if(!item || isNaN(amount) || amount <= 0) return;
   expenses.push({ id: uid(), item, amount, date, createdAt: Date.now() });
-  await storeSet(KEY_EXPS, expenses);
   itemEl.value=''; amtEl.value='';
   renderAll();
+  writeData();
 }
 
 async function deleteExpense(id){
   expenses = expenses.filter(x => x.id !== id);
-  await storeSet(KEY_EXPS, expenses);
   renderAll();
+  writeData();
 }
 
 function escapeHtml(s){
