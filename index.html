@@ -3,298 +3,754 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Date Fund — Budget & Track</title>
+<title>Date Budget & Track</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#FFF6F2;
-    --card:#FFFFFF;
-    --ink:#3B2235;
-    --ink-soft:#7A5C6E;
-    --rose:#E8607E;
-    --rose-deep:#C8425E;
-    --gold:#D9A441;
-    --amber:#DD8A3D;
-    --red:#C84B4B;
-    --line:#E9D9D4;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .app{
-    max-width:520px;
-    margin:0 auto;
-    padding:20px 16px 60px;
-  }
-  .eyebrow{
-    font-family:'Space Mono',monospace;
-    font-size:11px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--rose-deep);
-    margin:0 0 4px;
-  }
-  h1{
-    font-family:'Fraunces',serif;
-    font-weight:700;
-    font-size:30px;
-    margin:0 0 2px;
-    letter-spacing:-0.01em;
-  }
-  .sub{
-    font-size:13px;
-    color:var(--ink-soft);
-    margin:0 0 18px;
-  }
-  .banner{
-    display:none;
-    background:#FBE6E0;
-    color:var(--red);
-    font-size:12px;
-    padding:8px 12px;
-    border-radius:8px;
-    margin-bottom:14px;
-    font-family:'Space Mono',monospace;
-  }
-  .stub{
-    background:var(--card);
-    border-radius:16px;
-    box-shadow:0 1px 2px rgba(59,34,53,0.06), 0 8px 24px rgba(59,34,53,0.06);
-    overflow:hidden;
-    margin-bottom:18px;
-  }
-  .stub-pad{ padding:18px 18px 16px; }
-  .tear{
-    position:relative;
-    height:1px;
-    border-top:1px dashed var(--line);
-    margin:14px 0;
-  }
-  .tear::before, .tear::after{
-    content:"";
-    position:absolute;
-    top:-7px;
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:var(--paper);
-  }
-  .tear::before{ left:-25px; }
-  .tear::after{ right:-25px; }
-  .totals-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    margin-bottom:6px;
-  }
-  .totals-row .label{ font-size:13px; color:var(--ink-soft); }
-  .totals-row .value{
-    font-family:'Space Mono',monospace;
-    font-size:15px;
-    font-weight:700;
-  }
-  .totals-row.big .value{ font-size:24px; color:var(--rose-deep); }
-  .totals-row.big .label{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; color:var(--ink); }
-  .alloc-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .edit-link{
-    background:#FBE9ED;
-    border:none;
-    color:var(--rose-deep);
-    font-family:'Inter',sans-serif;
-    font-size:11.5px;
-    font-weight:600;
-    padding:5px 10px;
-    border-radius:14px;
-    cursor:pointer;
-  }
-  .bar-track{
-    height:9px;
-    background:#F1E4E0;
-    border-radius:6px;
-    margin:12px 0 4px;
-    overflow:hidden;
-  }
-  .bar-fill{
-    height:100%;
-    border-radius:6px;
-    transition:width .25s ease;
-  }
-  .bar-caption{
-    font-family:'Space Mono',monospace;
-    font-size:11px;
-    color:var(--ink-soft);
-  }
+:root{
+--paper:#FFF6F2;
+--card:#FFFFFF;
+--ink:#3B2235;
+--ink-soft:#7A5C6E;
+--rose:#E8607E;
+--rose-deep:#C8425E;
+--gold:#D9A441;
+--amber:#DD8A3D;
+--red:#C84B4B;
+--green:#5E8C61;
+--line:#E9D9D4;
+}
+*{box-sizing:border-box;}
+body{
+margin:0;
+background:var(--paper);
+color:var(--ink);
+font-family:'Inter',sans-serif;
+-webkit-font-smoothing:antialiased;
+overflow-x:hidden;
+}
+.app{
+max-width:520px;
+margin:0 auto;
+padding:20px 16px 90px;
+overflow-x:hidden;
+}
+.eyebrow{
+font-family:'Space Mono',monospace;
+font-size:11px;
+letter-spacing:.14em;
+text-transform:uppercase;
+color:var(--rose-deep);
+margin:0 0 4px;
+}
+h1{
+font-family:'Fraunces',serif;
+font-weight:700;
+font-size:30px;
+margin:0 0 2px;
+letter-spacing:-0.01em;
+}
+.sub{
+font-size:13px;
+color:var(--ink-soft);
+margin:0 0 18px;
+}
+.banner{
+display:none;
+background:#FBE6E0;
+color:var(--red);
+font-size:12px;
+padding:8px 12px;
+border-radius:8px;
+margin-bottom:14px;
+font-family:'Space Mono',monospace;
+}
+.section-title{
+font-family:'Fraunces',serif;
+font-weight:600;
+font-size:17px;
+margin:26px 0 10px;
+}
+.section-title.first{ margin-top:0; }
 
-  .section-title{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:17px;
-    margin:26px 0 10px;
-  }
+/* ── Budget stub ── */
+.stub{
+background:var(--card);
+border-radius:16px;
+box-shadow:0 1px 2px rgba(59,34,53,0.06), 0 8px 24px rgba(59,34,53,0.06);
+overflow:hidden;
+margin-bottom:18px;
+}
+.stub-pad{ padding:18px 18px 16px; }
+.tear{
+position:relative;
+height:1px;
+border-top:1px dashed var(--line);
+margin:14px 0;
+}
+.tear::before, .tear::after{
+content:"";
+position:absolute;
+top:-7px;
+width:14px;
+height:14px;
+border-radius:50%;
+background:var(--paper);
+}
+.tear::before{ left:-25px; }
+.tear::after{ right:-25px; }
+.totals-row{
+display:flex;
+justify-content:space-between;
+align-items:baseline;
+margin-bottom:6px;
+}
+.totals-row .label{ font-size:13px; color:var(--ink-soft); }
+.totals-row .value{
+font-family:'Space Mono',monospace;
+font-size:15px;
+font-weight:700;
+}
+.totals-row.big .value{ font-size:24px; color:var(--rose-deep); }
+.totals-row.big .label{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; color:var(--ink); }
+.alloc-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.edit-link{
+background:#FBE9ED;
+border:none;
+color:var(--rose-deep);
+font-family:'Inter',sans-serif;
+font-size:11.5px;
+font-weight:600;
+padding:5px 10px;
+border-radius:14px;
+cursor:pointer;
+}
+.bar-track{
+height:9px;
+background:#F1E4E0;
+border-radius:6px;
+margin:12px 0 4px;
+overflow:hidden;
+}
+.bar-fill{
+height:100%;
+border-radius:6px;
+transition:width .25s ease;
+}
+.bar-caption{
+font-family:'Space Mono',monospace;
+font-size:11px;
+color:var(--ink-soft);
+}
 
-  .form-card{
-    background:var(--card);
-    border-radius:14px;
-    padding:16px;
-    box-shadow:0 1px 2px rgba(59,34,53,0.05);
-  }
-  .field{ margin-bottom:12px; }
-  .field label{
-    display:block;
-    font-size:11.5px;
-    font-weight:600;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    letter-spacing:.04em;
-    margin-bottom:5px;
-  }
-  .field input{
-    width:100%;
-    padding:10px 11px;
-    border-radius:9px;
-    border:1px solid var(--line);
-    font-family:'Inter',sans-serif;
-    font-size:14.5px;
-    background:#FFFDFC;
-    color:var(--ink);
-  }
-  .field input:focus{
-    outline:2px solid var(--rose);
-    outline-offset:1px;
-  }
-  .row2{ display:flex; gap:10px; }
-  .row2 .field{ flex:1; }
-  .primary-btn{
-    width:100%;
-    background:var(--rose-deep);
-    color:#fff;
-    border:none;
-    padding:12px;
-    border-radius:10px;
-    font-weight:600;
-    font-size:14.5px;
-    cursor:pointer;
-    font-family:'Inter',sans-serif;
-  }
-  .primary-btn:active{ transform:scale(.99); }
+.form-card{
+background:var(--card);
+border-radius:14px;
+padding:16px;
+box-shadow:0 1px 2px rgba(59,34,53,0.05);
+}
+.field{ margin-bottom:12px; }
+.field label{
+display:block;
+font-size:11.5px;
+font-weight:600;
+color:var(--ink-soft);
+text-transform:uppercase;
+letter-spacing:.04em;
+margin-bottom:5px;
+}
+.field input{
+width:100%;
+max-width:100%;
+padding:10px 11px;
+border-radius:9px;
+border:1px solid var(--line);
+font-family:'Inter',sans-serif;
+font-size:14.5px;
+background:#FFFDFC;
+color:var(--ink);
+-webkit-appearance:none;
+appearance:none;
+box-sizing:border-box;
+}
+.field input[type="date"]{ text-align:left; min-height:0; }
+.field input[type="date"]::-webkit-date-and-time-value{ text-align:left; }
+.field input:focus{ outline:2px solid var(--rose); outline-offset:1px; }
+.row2{ display:flex; gap:10px; }
+.row2 .field{ flex:1; }
+.primary-btn{
+width:100%;
+background:var(--rose-deep);
+color:#fff;
+border:none;
+padding:12px;
+border-radius:10px;
+font-weight:600;
+font-size:14.5px;
+cursor:pointer;
+font-family:'Inter',sans-serif;
+}
+.primary-btn:active{ transform:scale(.99); }
 
-  .expense-row{
-    background:var(--card);
-    border-radius:12px;
-    padding:11px 14px;
-    margin-bottom:8px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-  }
-  .exp-left{ min-width:0; }
-  .exp-item{ font-size:14px; font-weight:500; }
-  .exp-meta{
-    font-size:11.5px;
-    color:var(--ink-soft);
-    font-family:'Space Mono',monospace;
-    margin-top:2px;
-  }
-  .exp-right{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-shrink:0;
-  }
-  .exp-amt{
-    font-family:'Space Mono',monospace;
-    font-weight:700;
-    font-size:14px;
-  }
-  .del-x{
-    background:#F4EAE7;
-    border:none;
-    width:24px;height:24px;
-    border-radius:50%;
-    color:var(--ink-soft);
-    font-size:13px;
-    cursor:pointer;
-    line-height:1;
-  }
-  .empty{
-    text-align:center;
-    padding:28px 16px;
-    color:var(--ink-soft);
-    font-size:13.5px;
-  }
-  .empty .big-emoji{ font-size:28px; display:block; margin-bottom:8px; }
+.expense-row{
+background:var(--card);
+border-radius:12px;
+padding:11px 14px;
+margin-bottom:8px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+}
+.exp-left{ min-width:0; }
+.exp-item{ font-size:14px; font-weight:500; }
+.exp-meta{
+font-size:11.5px;
+color:var(--ink-soft);
+font-family:'Space Mono',monospace;
+margin-top:2px;
+}
+.exp-right{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.exp-amt{ font-family:'Space Mono',monospace; font-weight:700; font-size:14px; }
+.del-x{
+background:#F4EAE7;
+border:none;
+width:24px;height:24px;
+border-radius:50%;
+color:var(--ink-soft);
+font-size:13px;
+cursor:pointer;
+line-height:1;
+}
+.empty{
+text-align:center;
+padding:28px 16px;
+color:var(--ink-soft);
+font-size:13.5px;
+}
+.empty .big-emoji{ font-size:28px; display:block; margin-bottom:8px; }
+
+footer{
+margin-top:30px;
+text-align:center;
+font-size:11px;
+color:var(--ink-soft);
+opacity:.6;
+letter-spacing:.04em;
+}
+
+/* ── Floating spin button ── */
+.fab{
+position:fixed;
+bottom:22px;
+right:20px;
+z-index:50;
+width:62px; height:62px;
+border-radius:50%;
+border:none;
+background:var(--rose-deep);
+color:#fff;
+font-size:26px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+box-shadow:0 6px 18px rgba(200,66,90,0.45);
+}
+.fab::before{
+content:'';
+position:absolute;
+inset:-7px;
+border-radius:50%;
+border:2px solid var(--rose-deep);
+opacity:0.5;
+animation:fabPulse 2.2s ease-out infinite;
+}
+@keyframes fabPulse{
+0%{ transform:scale(1); opacity:0.55; }
+100%{ transform:scale(1.35); opacity:0; }
+}
+.fab:active{ transform:scale(.94); }
+.fab-tag{
+position:fixed;
+bottom:88px;
+right:18px;
+z-index:50;
+background:var(--ink);
+color:#fff;
+font-family:'Space Mono',monospace;
+font-size:10.5px;
+letter-spacing:.04em;
+padding:5px 9px;
+border-radius:8px;
+opacity:.85;
+pointer-events:none;
+}
+
+/* ── Modal ── */
+.modal-overlay{
+position:fixed;
+inset:0;
+background:rgba(59,34,53,0.55);
+z-index:100;
+display:none;
+align-items:center;
+justify-content:center;
+padding:18px;
+}
+.modal-overlay.visible{ display:flex; }
+.modal-card{
+background:var(--paper);
+width:100%;
+max-width:360px;
+max-height:88vh;
+overflow-y:auto;
+border-radius:20px;
+padding:20px 16px 18px;
+position:relative;
+}
+.modal-close{
+position:absolute;
+top:10px; right:10px;
+width:30px; height:30px;
+border-radius:50%;
+border:none;
+background:#F4EAE7;
+color:var(--ink-soft);
+font-size:15px;
+cursor:pointer;
+line-height:1;
+z-index:5;
+}
+.modal-title{
+font-family:'Fraunces',serif;
+font-weight:700;
+font-size:19px;
+text-align:center;
+margin:2px 0 14px;
+}
+
+.wheel-card{
+background:var(--card);
+border-radius:16px;
+box-shadow:0 1px 2px rgba(59,34,53,0.06), 0 8px 24px rgba(59,34,53,0.06);
+padding:24px 14px 20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:16px;
+}
+.wheel-outer{
+position:relative;
+width:min(230px, 64vw);
+height:min(230px, 64vw);
+flex-shrink:0;
+}
+.wheel-outer::before{
+content:'';
+position:absolute;
+inset:-10px;
+border-radius:50%;
+background:conic-gradient(from 0deg, var(--rose), var(--gold), var(--green), var(--rose-deep), var(--rose));
+opacity:0.3;
+filter:blur(10px);
+animation:glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse{ 0%,100%{opacity:0.2;} 50%{opacity:0.4;} }
+canvas#wheel{ position:relative; z-index:2; border-radius:50%; cursor:pointer; display:block; }
+.pointer{
+position:absolute;
+top:50%; right:-2px;
+transform:translateY(-50%);
+z-index:10;
+width:0;height:0;
+border-top:11px solid transparent;
+border-bottom:11px solid transparent;
+border-right:24px solid var(--gold);
+filter:drop-shadow(0 0 4px rgba(217,164,65,0.55));
+}
+.spin-btn{
+position:absolute;
+top:50%; left:50%;
+transform:translate(-50%,-50%);
+z-index:10;
+width:54px; height:54px;
+border-radius:50%;
+border:none;
+background:var(--rose-deep);
+color:#fff;
+font-family:'Inter',sans-serif;
+font-size:10.5px;
+font-weight:700;
+letter-spacing:.08em;
+text-transform:uppercase;
+cursor:pointer;
+box-shadow:0 0 0 5px var(--card), 0 4px 14px rgba(200,66,90,0.4);
+transition:transform .15s ease;
+}
+.spin-btn:active{ transform:translate(-50%,-50%) scale(.94); }
+.spin-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+.result-card{
+width:100%;
+text-align:center;
+opacity:0;
+transform:translateY(10px);
+transition:opacity .4s ease, transform .4s ease;
+pointer-events:none;
+}
+.result-card.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.result-card .emoji{ font-size:30px; display:block; margin-bottom:4px; }
+.result-card .reslabel{
+font-family:'Space Mono',monospace;
+font-size:10.5px;
+letter-spacing:.14em;
+text-transform:uppercase;
+color:var(--gold);
+margin-bottom:3px;
+}
+.result-card .activity{ font-family:'Fraunces',serif; font-weight:700; font-size:21px; color:var(--ink); }
+.result-card .ressub{ margin-top:5px; font-size:12.5px; color:var(--ink-soft); }
+.log-this-btn{
+margin-top:14px;
+background:#FBE9ED;
+border:none;
+color:var(--rose-deep);
+font-family:'Inter',sans-serif;
+font-size:12.5px;
+font-weight:600;
+padding:9px 16px;
+border-radius:18px;
+cursor:pointer;
+display:none;
+}
+
+.confetti-piece{
+position:fixed;
+width:7px; height:7px;
+border-radius:50%;
+pointer-events:none;
+animation:confettiFall var(--dur) ease-in forwards;
+z-index:999;
+}
+@keyframes confettiFall{
+0%{ transform:translate(0,0) rotate(0deg) scale(1); opacity:1; }
+100%{ transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.3); opacity:0; }
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <p class="eyebrow">Just the two of you</p>
-  <h1>Date Fund</h1>
-  <p class="sub">One pooled budget for dating activities — log what you spend against it.</p>
+<p class="eyebrow">Just the two of you</p>
+<h1>Date Budget</h1>
+<p class="sub">One pooled budget for dating activities. Tap 🎡 if you need inspiration.</p>
 
-  <div class="banner" id="storageBanner">⚠ Saving isn't available right now — changes will be lost on refresh.</div>
+<div class="banner" id="storageBanner">⚠ Saving isn't available right now — changes will be lost on refresh.</div>
 
-  <!-- SUMMARY STUB -->
-  <div class="stub">
-    <div class="stub-pad">
-      <div class="alloc-row">
-        <div class="totals-row" style="margin-bottom:0;">
-          <span class="label">Monthly budget</span>
-          <span class="value" id="sumAllocated">RM 0.00</span>
-        </div>
-        <button class="edit-link" id="editAllocBtn">Edit</button>
-      </div>
-      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%; background:var(--rose-deep);"></div></div>
-      <div class="bar-caption" id="barCaption">RM 0.00 spent</div>
-      <div class="tear"></div>
-      <div class="totals-row big">
-        <span class="label">Remaining</span>
-        <span class="value" id="sumRemaining">RM 0.00</span>
-      </div>
-    </div>
-  </div>
+<!-- SUMMARY STUB -->
+<div class="stub">
+<div class="stub-pad">
+<div class="alloc-row">
+<div class="totals-row" style="margin-bottom:0;">
+<span class="label">Monthly budget</span>
+<span class="value" id="sumAllocated">RM 0.00</span>
+</div>
+<button class="edit-link" id="editAllocBtn">Edit</button>
+</div>
+<div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%; background:var(--green);"></div></div>
+<div class="bar-caption" id="barCaption">RM 0.00 spent</div>
+<div class="tear"></div>
+<div class="totals-row big">
+<span class="label">Remaining</span>
+<span class="value" id="sumRemaining">RM 0.00</span>
+</div>
+</div>
+</div>
 
-  <!-- ADD EXPENSE -->
-  <div class="section-title">Log an expense</div>
-  <div class="form-card">
-    <div class="row2">
-      <div class="field" style="flex:2;">
-        <label for="expItem">Item</label>
-        <input id="expItem" type="text" placeholder="e.g. Sushi dinner" maxlength="60">
-      </div>
-      <div class="field" style="flex:1;">
-        <label for="expAmt">Amount</label>
-        <input id="expAmt" type="number" min="0" step="0.01" placeholder="0.00">
-      </div>
-    </div>
-    <div class="field">
-      <label for="expDate">Date</label>
-      <input id="expDate" type="date">
-    </div>
-    <button class="primary-btn" id="addExpBtn">Add expense</button>
-  </div>
+<!-- ADD EXPENSE -->
+<div class="section-title first" id="expenseSection">Log an expense</div>
+<div class="form-card">
+<div class="row2">
+<div class="field" style="flex:2;">
+<label for="expItem">Item</label>
+<input id="expItem" type="text" placeholder="e.g. Sushi dinner" maxlength="60">
+</div>
+<div class="field" style="flex:1;">
+<label for="expAmt">Amount</label>
+<input id="expAmt" type="number" min="0" step="0.01" placeholder="0.00">
+</div>
+</div>
+<div class="field">
+<label for="expDate">Date</label>
+<input id="expDate" type="date">
+</div>
+<button class="primary-btn" id="addExpBtn">Add expense</button>
+</div>
 
-  <!-- HISTORY -->
-  <div class="section-title">History</div>
-  <div id="expenseList"></div>
-  <div class="empty" id="expEmpty" style="display:none;">
-    <span class="big-emoji">🧾</span>
-    No expenses logged yet.
-  </div>
+<!-- HISTORY -->
+<div class="section-title">History</div>
+<div id="expenseList"></div>
+<div class="empty" id="expEmpty" style="display:none;">
+<span class="big-emoji">🧾</span>
+No expenses logged yet.
+</div>
+
+<footer>Made with love &amp; a little randomness ✦</footer>
 
 </div>
 
+<!-- FLOATING SPIN BUTTON -->
+<button class="fab" id="fabSpin" aria-label="Spin for a date idea">🎡</button>
+
+<!-- SPIN MODAL -->
+<div class="modal-overlay" id="spinModal">
+<div class="modal-card">
+<button class="modal-close" id="modalClose" aria-label="Close">×</button>
+<div class="modal-title">Tonight's pick</div>
+<div class="wheel-card">
+<div class="wheel-outer">
+<canvas id="wheel"></canvas>
+<div class="pointer"></div>
+<button class="spin-btn" id="spinBtn">SPIN</button>
+</div>
+<div class="result-card" id="resultCard">
+<span class="emoji" id="resultEmoji">💕</span>
+<div class="reslabel">Tonight's activity</div>
+<div class="activity" id="resultText">—</div>
+<div class="ressub" id="resultSub">Have fun together!</div>
+<button class="log-this-btn" id="logThisBtn">Log this date →</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- WHEEL LOGIC -->
+<script>
+const ACTIVITIES = [
+{ name: "Urut Kaki", emoji: "🦶", sub: "Relax & unwind together~", color: "#8C5E7A" },
+{ name: "Spa Onsen", emoji: "♨️", sub: "Soak it all away, you deserve it!", color: "#E8607E" },
+{ name: "Dinner", emoji: "🍽️", sub: "Dress up, eat good, be fancy!", color: "#D9A441" },
+{ name: "TRX Movie", emoji: "🎬", sub: "Grab popcorn & snuggle up!", color: "#6B4C73" },
+{ name: "Tidur", emoji: "😴", sub: "Sometimes rest IS the date 💤", color: "#5C7A9B" },
+{ name: "Study Date @ Cafe", emoji: "☕", sub: "Laptops out, lattes in 📚", color: "#A6743C" },
+];
+const INNER = ["#C79DB9","#F7A9BC","#F0C685","#A98AB0","#9DB8CF","#CDA873"];
+
+const N = ACTIVITIES.length;
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const spinBtn = document.getElementById('spinBtn');
+const resultCard = document.getElementById('resultCard');
+const resultText = document.getElementById('resultText');
+const resultEmoji = document.getElementById('resultEmoji');
+const resultSub = document.getElementById('resultSub');
+const logThisBtn = document.getElementById('logThisBtn');
+const fabSpin = document.getElementById('fabSpin');
+const spinModal = document.getElementById('spinModal');
+const modalClose = document.getElementById('modalClose');
+
+function getSize(){
+const outer = document.querySelector('.wheel-outer');
+if(outer && outer.clientWidth > 0) return outer.clientWidth;
+return Math.min(230, window.innerWidth * 0.64);
+}
+let SIZE = getSize();
+canvas.width = SIZE;
+canvas.height = SIZE;
+let R = SIZE / 2;
+const ARC = (2 * Math.PI) / N;
+
+let currentAngle = 0;
+let spinning = false;
+let lastWinner = null;
+
+function drawWheel(rotation){
+ctx.clearRect(0, 0, SIZE, SIZE);
+ctx.save();
+ctx.translate(R, R);
+ctx.rotate(rotation);
+
+for(let i = 0; i < N; i++){
+const start = i * ARC;
+const end = start + ARC;
+const act = ACTIVITIES[i];
+
+ctx.beginPath();
+ctx.moveTo(0, 0);
+ctx.arc(0, 0, R - 3, start, end);
+ctx.closePath();
+
+const gx = Math.cos(start + ARC/2) * R * 0.5;
+const gy = Math.sin(start + ARC/2) * R * 0.5;
+const grad = ctx.createRadialGradient(gx, gy, 0, 0, 0, R);
+grad.addColorStop(0, INNER[i]);
+grad.addColorStop(1, act.color);
+ctx.fillStyle = grad;
+ctx.fill();
+
+ctx.strokeStyle = 'rgba(255,246,242,0.8)';
+ctx.lineWidth = 2;
+ctx.stroke();
+
+ctx.save();
+const midAngle = start + ARC/2;
+const textR = R * 0.6;
+ctx.rotate(midAngle);
+ctx.translate(textR, 0);
+ctx.rotate(Math.PI/2);
+ctx.textAlign = 'center';
+ctx.fillStyle = '#FFF8F4';
+ctx.shadowColor = 'rgba(59,34,53,0.45)';
+ctx.shadowBlur = 3;
+
+const words = act.name.split(' ');
+const fontSize = SIZE * 0.052;
+const lineH = fontSize * 1.28;
+
+ctx.font = `${SIZE * 0.058}px serif`;
+const emojiY = words.length > 1 ? -(lineH * 1.05) : -(lineH * 0.7);
+ctx.fillText(act.emoji, 0, emojiY);
+
+ctx.font = `700 ${fontSize}px 'Inter', sans-serif`;
+const totalH = words.length * lineH;
+words.forEach((w, wi) => {
+const y = wi * lineH - totalH/2 + lineH * 0.55;
+ctx.fillText(w, 0, y);
+});
+ctx.restore();
+}
+
+ctx.beginPath();
+ctx.arc(0, 0, SIZE * 0.1, 0, 2 * Math.PI);
+ctx.fillStyle = '#FFFFFF';
+ctx.fill();
+ctx.strokeStyle = 'rgba(200,66,90,0.25)';
+ctx.lineWidth = 2;
+ctx.stroke();
+
+ctx.restore();
+}
+drawWheel(currentAngle);
+
+function resizeWheel(){
+SIZE = getSize();
+canvas.width = SIZE;
+canvas.height = SIZE;
+R = SIZE / 2;
+drawWheel(currentAngle);
+}
+
+function openModal(){
+spinModal.classList.add('visible');
+document.body.style.overflow = 'hidden';
+resizeWheel();
+}
+function closeModal(){
+spinModal.classList.remove('visible');
+document.body.style.overflow = '';
+}
+fabSpin.addEventListener('click', openModal);
+modalClose.addEventListener('click', closeModal);
+spinModal.addEventListener('click', (e) => {
+if(e.target === spinModal) closeModal();
+});
+
+spinBtn.addEventListener('click', () => {
+if(spinning) return;
+spinning = true;
+spinBtn.disabled = true;
+resultCard.classList.remove('visible');
+logThisBtn.style.display = 'none';
+
+const targetSlice = Math.floor(Math.random() * N);
+const extraSpins = 5 + Math.floor(Math.random() * 4);
+const baseAngle = -(targetSlice * ARC + ARC/2);
+const turns = Math.ceil((currentAngle - baseAngle) / (2*Math.PI)) + extraSpins;
+const finalAngle = baseAngle + turns * 2 * Math.PI;
+
+const duration = 4200 + Math.random() * 800;
+const startTime = performance.now();
+const startAngle = currentAngle;
+
+function easeOut(t){ return 1 - Math.pow(1-t, 3.5); }
+
+function animate(now){
+const elapsed = now - startTime;
+const t = Math.min(elapsed/duration, 1);
+currentAngle = startAngle + (finalAngle - startAngle) * easeOut(t);
+drawWheel(currentAngle);
+if(t < 1){
+requestAnimationFrame(animate);
+}else{
+const normalized = ((-currentAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+const landed = Math.floor(normalized/ARC) % N;
+spinning = false;
+spinBtn.disabled = false;
+showResult(landed);
+}
+}
+requestAnimationFrame(animate);
+});
+
+function showResult(index){
+const act = ACTIVITIES[index];
+lastWinner = act;
+resultEmoji.textContent = act.emoji;
+resultText.textContent = act.name;
+resultSub.textContent = act.sub;
+resultCard.classList.add('visible');
+logThisBtn.style.display = 'inline-block';
+fireConfetti(act.color);
+}
+
+function fireConfetti(mainColor){
+const colors = [mainColor, '#E8607E', '#D9A441', '#5E8C61', '#FFFFFF'];
+const rect = document.querySelector('.wheel-outer').getBoundingClientRect();
+const cx = rect.left + rect.width/2;
+const cy = rect.top + rect.height/2;
+for(let i = 0; i < 50; i++){
+const el = document.createElement('div');
+el.className = 'confetti-piece';
+const angle = Math.random() * 2 * Math.PI;
+const dist = 70 + Math.random() * 220;
+const dx = Math.cos(angle) * dist;
+const dy = Math.sin(angle) * dist - 40;
+const dur = 0.8 + Math.random() * 0.7;
+const rot = Math.round(Math.random()*720 - 360) + 'deg';
+const size = 5 + Math.random() * 7;
+const shape = Math.random() > 0.5 ? '50%' : '2px';
+el.style.cssText = `
+left:${cx}px; top:${cy}px;
+width:${size}px; height:${size}px;
+border-radius:${shape};
+background:${colors[Math.floor(Math.random()*colors.length)]};
+--dx:${dx}px; --dy:${dy}px; --rot:${rot}; --dur:${dur}s;
+`;
+document.body.appendChild(el);
+setTimeout(() => el.remove(), dur*1000 + 100);
+}
+}
+
+logThisBtn.addEventListener('click', () => {
+if(!lastWinner) return;
+const itemEl = document.getElementById('expItem');
+itemEl.value = `${lastWinner.emoji} ${lastWinner.name}`;
+closeModal();
+document.getElementById('expenseSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+setTimeout(() => document.getElementById('expAmt').focus(), 450);
+});
+
+window.addEventListener('resize', () => {
+if(spinModal.classList.contains('visible')) resizeWheel();
+});
+</script>
+
+<!-- BUDGET + FIRESTORE SYNC -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -319,144 +775,143 @@ function fmt(n){ return 'RM ' + (Math.round(n*100)/100).toFixed(2); }
 function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
 function showBanner(msg){
-  const b = document.getElementById('storageBanner');
-  b.textContent = msg;
-  b.style.display = 'block';
+const b = document.getElementById('storageBanner');
+b.textContent = msg;
+b.style.display = 'block';
 }
 function hideBanner(){
-  document.getElementById('storageBanner').style.display = 'none';
+document.getElementById('storageBanner').style.display = 'none';
 }
 
 async function writeData(){
-  if(!docRef) return;
-  try{
-    await setDoc(docRef, { budget, expenses }, { merge: true });
-  }catch(e){
-    showBanner('⚠ Could not sync — check your connection.');
-  }
+if(!docRef) return;
+try{
+await setDoc(docRef, { budget, expenses }, { merge: true });
+}catch(e){
+showBanner('⚠ Could not sync — check your connection.');
+}
 }
 
 async function init(){
-  document.getElementById('expDate').value = todayStr();
-  document.getElementById('editAllocBtn').addEventListener('click', editBudget);
-  document.getElementById('addExpBtn').addEventListener('click', addExpense);
+document.getElementById('expDate').value = todayStr();
+document.getElementById('editAllocBtn').addEventListener('click', editBudget);
+document.getElementById('addExpBtn').addEventListener('click', addExpense);
 
-  try{
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    docRef = doc(db, 'datefund', 'shared');
+try{
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+docRef = doc(db, 'datefund', 'shared');
 
-    onSnapshot(docRef, (snap) => {
-      hideBanner();
-      if(snap.exists()){
-        const data = snap.data();
-        budget = typeof data.budget === 'number' ? data.budget : 0;
-        expenses = Array.isArray(data.expenses) ? data.expenses : [];
-        renderAll();
-      } else {
-        const val = prompt('Set your monthly dating budget (RM):', '500');
-        const num = parseFloat(val);
-        budget = (!isNaN(num) && num >= 0) ? num : 0;
-        expenses = [];
-        renderAll();
-        writeData();
-      }
-    }, () => {
-      showBanner('⚠ Could not connect — check your Firebase config.');
-    });
-  }catch(e){
-    showBanner('⚠ Sync not set up yet — add your Firebase keys in the code.');
-    renderAll();
-  }
+onSnapshot(docRef, (snap) => {
+hideBanner();
+if(snap.exists()){
+const data = snap.data();
+budget = typeof data.budget === 'number' ? data.budget : 0;
+expenses = Array.isArray(data.expenses) ? data.expenses : [];
+renderAll();
+} else {
+const val = prompt('Set your monthly dating budget (RM):', '500');
+const num = parseFloat(val);
+budget = (!isNaN(num) && num >= 0) ? num : 0;
+expenses = [];
+renderAll();
+writeData();
+}
+}, () => {
+showBanner('⚠ Could not connect — check your Firebase config.');
+});
+}catch(e){
+showBanner('⚠ Sync not set up yet — add your Firebase keys in the code.');
+renderAll();
+}
 }
 
 function renderAll(){
-  renderSummary();
-  renderExpenses();
+renderSummary();
+renderExpenses();
 }
 
 function renderSummary(){
-  const totalSpent = expenses.reduce((s,x)=> s + x.amount, 0);
-  const remaining = budget - totalSpent;
-  const pct = budget > 0 ? Math.round((totalSpent/budget)*100) : (totalSpent>0?100:0);
+const totalSpent = expenses.reduce((s,x)=> s + x.amount, 0);
+const remaining = budget - totalSpent;
+const pct = budget > 0 ? Math.round((totalSpent/budget)*100) : (totalSpent>0?100:0);
 
-  document.getElementById('sumAllocated').textContent = fmt(budget);
-  document.getElementById('barCaption').textContent = `${fmt(totalSpent)} spent · ${Math.min(pct,999)}%`;
+document.getElementById('sumAllocated').textContent = fmt(budget);
+document.getElementById('barCaption').textContent = `${fmt(totalSpent)} spent · ${Math.min(pct,999)}%`;
 
-  let color = 'var(--rose-deep)';
-  if(pct >= 100) color = 'var(--red)';
-  else if(pct >= 75) color = 'var(--amber)';
-  document.getElementById('barFill').style.width = Math.min(pct,100) + '%';
-  document.getElementById('barFill').style.background = color;
+let color = 'var(--green)';
+if(pct >= 100) color = 'var(--red)';
+document.getElementById('barFill').style.width = Math.min(pct,100) + '%';
+document.getElementById('barFill').style.background = color;
 
-  const remEl = document.getElementById('sumRemaining');
-  remEl.textContent = fmt(remaining);
-  remEl.style.color = remaining < 0 ? 'var(--red)' : 'var(--rose-deep)';
+const remEl = document.getElementById('sumRemaining');
+remEl.textContent = fmt(remaining);
+remEl.style.color = remaining < 0 ? 'var(--red)' : 'var(--rose-deep)';
 }
 
 function renderExpenses(){
-  const list = document.getElementById('expenseList');
-  const empty = document.getElementById('expEmpty');
-  list.innerHTML = '';
+const list = document.getElementById('expenseList');
+const empty = document.getElementById('expEmpty');
+list.innerHTML = '';
 
-  const shown = [...expenses].sort((a,b)=> b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+const shown = [...expenses].sort((a,b)=> b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
 
-  if(shown.length === 0){ empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
+if(shown.length === 0){ empty.style.display = 'block'; return; }
+empty.style.display = 'none';
 
-  shown.forEach(exp => {
-    const row = document.createElement('div');
-    row.className = 'expense-row';
-    row.innerHTML = `
-      <div class="exp-left">
-        <div class="exp-item">${escapeHtml(exp.item)}</div>
-        <div class="exp-meta">${exp.date}</div>
-      </div>
-      <div class="exp-right">
-        <span class="exp-amt">${fmt(exp.amount)}</span>
-        <button class="del-x" data-id="${exp.id}" aria-label="Delete expense">×</button>
-      </div>
-    `;
-    list.appendChild(row);
-  });
+shown.forEach(exp => {
+const row = document.createElement('div');
+row.className = 'expense-row';
+row.innerHTML = `
+<div class="exp-left">
+<div class="exp-item">${escapeHtml(exp.item)}</div>
+<div class="exp-meta">${exp.date}</div>
+</div>
+<div class="exp-right">
+<span class="exp-amt">${fmt(exp.amount)}</span>
+<button class="del-x" data-id="${exp.id}" aria-label="Delete expense">×</button>
+</div>
+`;
+list.appendChild(row);
+});
 
-  list.querySelectorAll('.del-x').forEach(btn => {
-    btn.addEventListener('click', () => deleteExpense(btn.dataset.id));
-  });
+list.querySelectorAll('.del-x').forEach(btn => {
+btn.addEventListener('click', () => deleteExpense(btn.dataset.id));
+});
 }
 
 async function editBudget(){
-  const val = prompt('Set your monthly dating budget (RM):', budget);
-  if(val === null) return;
-  const num = parseFloat(val);
-  if(isNaN(num) || num < 0) return;
-  budget = num;
-  renderAll();
-  writeData();
+const val = prompt('Set your monthly dating budget (RM):', budget);
+if(val === null) return;
+const num = parseFloat(val);
+if(isNaN(num) || num < 0) return;
+budget = num;
+renderAll();
+writeData();
 }
 
 async function addExpense(){
-  const itemEl = document.getElementById('expItem');
-  const amtEl = document.getElementById('expAmt');
-  const dateEl = document.getElementById('expDate');
-  const item = itemEl.value.trim();
-  const amount = parseFloat(amtEl.value);
-  const date = dateEl.value || todayStr();
-  if(!item || isNaN(amount) || amount <= 0) return;
-  expenses.push({ id: uid(), item, amount, date, createdAt: Date.now() });
-  itemEl.value=''; amtEl.value='';
-  renderAll();
-  writeData();
+const itemEl = document.getElementById('expItem');
+const amtEl = document.getElementById('expAmt');
+const dateEl = document.getElementById('expDate');
+const item = itemEl.value.trim();
+const amount = parseFloat(amtEl.value);
+const date = dateEl.value || todayStr();
+if(!item || isNaN(amount) || amount <= 0) return;
+expenses.push({ id: uid(), item, amount, date, createdAt: Date.now() });
+itemEl.value=''; amtEl.value='';
+renderAll();
+writeData();
 }
 
 async function deleteExpense(id){
-  expenses = expenses.filter(x => x.id !== id);
-  renderAll();
-  writeData();
+expenses = expenses.filter(x => x.id !== id);
+renderAll();
+writeData();
 }
 
 function escapeHtml(s){
-  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
 init();

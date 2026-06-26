@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Date Fund — Budget & Track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFF6F2;
+    --card:#FFFFFF;
+    --ink:#3B2235;
+    --ink-soft:#7A5C6E;
+    --rose:#E8607E;
+    --rose-deep:#C8425E;
+    --gold:#D9A441;
+    --amber:#DD8A3D;
+    --red:#C84B4B;
+    --line:#E9D9D4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    max-width:520px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+  }
+  .eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+    margin:0 0 4px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:30px;
+    margin:0 0 2px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+  }
+  .banner{
+    display:none;
+    background:#FBE6E0;
+    color:var(--red);
+    font-size:12px;
+    padding:8px 12px;
+    border-radius:8px;
+    margin-bottom:14px;
+    font-family:'Space Mono',monospace;
+  }
+  .stub{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 1px 2px rgba(59,34,53,0.06), 0 8px 24px rgba(59,34,53,0.06);
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .stub-pad{ padding:18px 18px 16px; }
+  .tear{
+    position:relative;
+    height:1px;
+    border-top:1px dashed var(--line);
+    margin:14px 0;
+  }
+  .tear::before, .tear::after{
+    content:"";
+    position:absolute;
+    top:-7px;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--paper);
+  }
+  .tear::before{ left:-25px; }
+  .tear::after{ right:-25px; }
+  .totals-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:6px;
+  }
+  .totals-row .label{ font-size:13px; color:var(--ink-soft); }
+  .totals-row .value{
+    font-family:'Space Mono',monospace;
+    font-size:15px;
+    font-weight:700;
+  }
+  .totals-row.big .value{ font-size:24px; color:var(--rose-deep); }
+  .totals-row.big .label{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; color:var(--ink); }
+  .alloc-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .edit-link{
+    background:#FBE9ED;
+    border:none;
+    color:var(--rose-deep);
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    padding:5px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  .bar-track{
+    height:9px;
+    background:#F1E4E0;
+    border-radius:6px;
+    margin:12px 0 4px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:6px;
+    transition:width .25s ease;
+  }
+  .bar-caption{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
+  .section-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    margin:26px 0 10px;
+  }
+
+  .form-card{
+    background:var(--card);
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 1px 2px rgba(59,34,53,0.05);
+  }
+  .field{ margin-bottom:12px; }
+  .field label{
+    display:block;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin-bottom:5px;
+  }
+  .field input{
+    width:100%;
+    padding:10px 11px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    background:#FFFDFC;
+    color:var(--ink);
+  }
+  .field input:focus{
+    outline:2px solid var(--rose);
+    outline-offset:1px;
+  }
+  .row2{ display:flex; gap:10px; }
+  .row2 .field{ flex:1; }
+  .primary-btn{
+    width:100%;
+    background:var(--rose-deep);
+    color:#fff;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .primary-btn:active{ transform:scale(.99); }
+
+  .expense-row{
+    background:var(--card);
+    border-radius:12px;
+    padding:11px 14px;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .exp-left{ min-width:0; }
+  .exp-item{ font-size:14px; font-weight:500; }
+  .exp-meta{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-family:'Space Mono',monospace;
+    margin-top:2px;
+  }
+  .exp-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+  }
+  .exp-amt{
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    font-size:14px;
+  }
+  .del-x{
+    background:#F4EAE7;
+    border:none;
+    width:24px;height:24px;
+    border-radius:50%;
+    color:var(--ink-soft);
+    font-size:13px;
+    cursor:pointer;
+    line-height:1;
+  }
+  .empty{
+    text-align:center;
+    padding:28px 16px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+  .empty .big-emoji{ font-size:28px; display:block; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <p class="eyebrow">Just the two of you</p>
+  <h1>Date Fund</h1>
+  <p class="sub">One pooled budget for dating activities — log what you spend against it.</p>
+
+  <div class="banner" id="storageBanner">⚠ Saving isn't available right now — changes will be lost on refresh.</div>
+
+  <!-- SUMMARY STUB -->
+  <div class="stub">
+    <div class="stub-pad">
+      <div class="alloc-row">
+        <div class="totals-row" style="margin-bottom:0;">
+          <span class="label">Monthly budget</span>
+          <span class="value" id="sumAllocated">RM 0.00</span>
+        </div>
+        <button class="edit-link" id="editAllocBtn">Edit</button>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%; background:var(--rose-deep);"></div></div>
+      <div class="bar-caption" id="barCaption">RM 0.00 spent</div>
+      <div class="tear"></div>
+      <div class="totals-row big">
+        <span class="label">Remaining</span>
+        <span class="value" id="sumRemaining">RM 0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD EXPENSE -->
+  <div class="section-title">Log an expense</div>
+  <div class="form-card">
+    <div class="row2">
+      <div class="field" style="flex:2;">
+        <label for="expItem">Item</label>
+        <input id="expItem" type="text" placeholder="e.g. Sushi dinner" maxlength="60">
+      </div>
+      <div class="field" style="flex:1;">
+        <label for="expAmt">Amount</label>
+        <input id="expAmt" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <div class="field">
+      <label for="expDate">Date</label>
+      <input id="expDate" type="date">
+    </div>
+    <button class="primary-btn" id="addExpBtn">Add expense</button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="section-title">History</div>
+  <div id="expenseList"></div>
+  <div class="empty" id="expEmpty" style="display:none;">
+    <span class="big-emoji">🧾</span>
+    No expenses logged yet.
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 🔧 STEP: paste your own Firebase project config here (see setup guide)
+const firebaseConfig = {
+  apiKey: "AIzaSyDHkRWjx6-1YmrxQXydga2_-Ib4_IxYlCs",
+  authDomain: "test-3b44c.firebaseapp.com",
+  projectId: "test-3b44c",
+  storageBucket: "test-3b44c.firebasestorage.app",
+  messagingSenderId: "191063864532",
+  appId: "1:191063864532:web:9b370edae7ecf8aa383741",
+  measurementId: "G-N7NB6Q9TRH"
+};
+
+let budget = 0;
+let expenses = [];
+let docRef = null;
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function fmt(n){ return 'RM ' + (Math.round(n*100)/100).toFixed(2); }
+function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
+
+function showBanner(msg){
+  const b = document.getElementById('storageBanner');
+  b.textContent = msg;
+  b.style.display = 'block';
+}
+function hideBanner(){
+  document.getElementById('storageBanner').style.display = 'none';
+}
+
+async function writeData(){
+  if(!docRef) return;
+  try{
+    await setDoc(docRef, { budget, expenses }, { merge: true });
+  }catch(e){
+    showBanner('⚠ Could not sync — check your connection.');
+  }
+}
+
+async function init(){
+  document.getElementById('expDate').value = todayStr();
+  document.getElementById('editAllocBtn').addEventListener('click', editBudget);
+  document.getElementById('addExpBtn').addEventListener('click', addExpense);
+
+  try{
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    docRef = doc(db, 'datefund', 'shared');
+
+    onSnapshot(docRef, (snap) => {
+      hideBanner();
+      if(snap.exists()){
+        const data = snap.data();
+        budget = typeof data.budget === 'number' ? data.budget : 0;
+        expenses = Array.isArray(data.expenses) ? data.expenses : [];
+        renderAll();
+      } else {
+        const val = prompt('Set your monthly dating budget (RM):', '500');
+        const num = parseFloat(val);
+        budget = (!isNaN(num) && num >= 0) ? num : 0;
+        expenses = [];
+        renderAll();
+        writeData();
+      }
+    }, () => {
+      showBanner('⚠ Could not connect — check your Firebase config.');
+    });
+  }catch(e){
+    showBanner('⚠ Sync not set up yet — add your Firebase keys in the code.');
+    renderAll();
+  }
+}
+
+function renderAll(){
+  renderSummary();
+  renderExpenses();
+}
+
+function renderSummary(){
+  const totalSpent = expenses.reduce((s,x)=> s + x.amount, 0);
+  const remaining = budget - totalSpent;
+  const pct = budget > 0 ? Math.round((totalSpent/budget)*100) : (totalSpent>0?100:0);
+
+  document.getElementById('sumAllocated').textContent = fmt(budget);
+  document.getElementById('barCaption').textContent = `${fmt(totalSpent)} spent · ${Math.min(pct,999)}%`;
+
+  let color = 'var(--rose-deep)';
+  if(pct >= 100) color = 'var(--red)';
+  else if(pct >= 75) color = 'var(--amber)';
+  document.getElementById('barFill').style.width = Math.min(pct,100) + '%';
+  document.getElementById('barFill').style.background = color;
+
+  const remEl = document.getElementById('sumRemaining');
+  remEl.textContent = fmt(remaining);
+  remEl.style.color = remaining < 0 ? 'var(--red)' : 'var(--rose-deep)';
+}
+
+function renderExpenses(){
+  const list = document.getElementById('expenseList');
+  const empty = document.getElementById('expEmpty');
+  list.innerHTML = '';
+
+  const shown = [...expenses].sort((a,b)=> b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+
+  if(shown.length === 0){ empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  shown.forEach(exp => {
+    const row = document.createElement('div');
+    row.className = 'expense-row';
+    row.innerHTML = `
+      <div class="exp-left">
+        <div class="exp-item">${escapeHtml(exp.item)}</div>
+        <div class="exp-meta">${exp.date}</div>
+      </div>
+      <div class="exp-right">
+        <span class="exp-amt">${fmt(exp.amount)}</span>
+        <button class="del-x" data-id="${exp.id}" aria-label="Delete expense">×</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  list.querySelectorAll('.del-x').forEach(btn => {
+    btn.addEventListener('click', () => deleteExpense(btn.dataset.id));
+  });
+}
+
+async function editBudget(){
+  const val = prompt('Set your monthly dating budget (RM):', budget);
+  if(val === null) return;
+  const num = parseFloat(val);
+  if(isNaN(num) || num < 0) return;
+  budget = num;
+  renderAll();
+  writeData();
+}
+
+async function addExpense(){
+  const itemEl = document.getElementById('expItem');
+  const amtEl = document.getElementById('expAmt');
+  const dateEl = document.getElementById('expDate');
+  const item = itemEl.value.trim();
+  const amount = parseFloat(amtEl.value);
+  const date = dateEl.value || todayStr();
+  if(!item || isNaN(amount) || amount <= 0) return;
+  expenses.push({ id: uid(), item, amount, date, createdAt: Date.now() });
+  itemEl.value=''; amtEl.value='';
+  renderAll();
+  writeData();
+}
+
+async function deleteExpense(id){
+  expenses = expenses.filter(x => x.id !== id);
+  renderAll();
+  writeData();
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+init();
+</script>
+</body>
+</html>
