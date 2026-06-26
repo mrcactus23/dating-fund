@@ -269,15 +269,15 @@ right:20px;
 z-index:50;
 width:62px; height:62px;
 border-radius:50%;
-border:none;
-background:var(--rose-deep);
-color:#fff;
-font-size:26px;
+border:2.5px solid var(--rose-deep);
+background:var(--card);
+color:var(--ink);
+font-size:28px;
 display:flex;
 align-items:center;
 justify-content:center;
 cursor:pointer;
-box-shadow:0 6px 18px rgba(200,66,90,0.45);
+box-shadow:0 6px 18px rgba(200,66,90,0.35);
 }
 .fab::before{
 content:'';
@@ -485,7 +485,10 @@ z-index:999;
 <div class="section-title first" id="expenseSection">Log an expense</div>
 <div class="form-card">
 <div class="field">
-<label for="expCat">Category</label>
+<div class="alloc-row" style="margin-bottom:5px;">
+<label for="expCat" style="margin-bottom:0;">Category</label>
+<button type="button" class="edit-link" id="manageCatBtn" style="padding:3px 9px; font-size:10.5px;">Manage</button>
+</div>
 <select id="expCat"></select>
 </div>
 <div class="row2">
@@ -814,6 +817,7 @@ document.getElementById('expDate').value = todayStr();
 document.getElementById('editAllocBtn').addEventListener('click', editBudget);
 document.getElementById('addExpBtn').addEventListener('click', addExpense);
 document.getElementById('expCat').addEventListener('change', handleCategoryChange);
+document.getElementById('manageCatBtn').addEventListener('click', manageCategories);
 
 try{
 const app = initializeApp(firebaseConfig);
@@ -959,6 +963,26 @@ writeData();
 }
 renderCategorySelect();
 sel.value = exists ? categories.find(c => c.toLowerCase() === trimmed.toLowerCase()) : trimmed;
+}
+
+function manageCategories(){
+if(categories.length === 0) return;
+const listText = categories.map((c, i) => `${i+1}. ${c}`).join('\n');
+const answer = prompt(`Type the number of the category to remove:\n\n${listText}`);
+if(answer === null) return;
+const idx = parseInt(answer.trim(), 10) - 1;
+if(isNaN(idx) || idx < 0 || idx >= categories.length) return;
+const name = categories[idx];
+
+if(categories.length === 1){
+alert("You need at least one category — add another before removing this one.");
+return;
+}
+if(!confirm(`Remove "${name}"? Past expenses already tagged with it will keep showing it — it just won't be selectable for new ones.`)) return;
+
+categories.splice(idx, 1);
+writeData();
+renderCategorySelect();
 }
 
 async function addExpense(){
