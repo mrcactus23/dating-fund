@@ -10,7 +10,7 @@ Public Mutual has zero tolerance on virus/malware infiltration into our network 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Date Budget</title>
+<title>Date Budget & Track</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -154,18 +154,6 @@ font-size:11px;
 color:var(--ink-soft);
 }
 
-/* ── Category breakdown ── */
-.cat-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:9px 0;
-border-bottom:1px solid var(--line);
-}
-.cat-row:last-child{ border-bottom:none; }
-.cat-name{ font-size:13.5px; font-weight:500; }
-.cat-amt{ font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--rose-deep); }
-
 .form-card{
 background:var(--card);
 border-radius:14px;
@@ -182,7 +170,7 @@ text-transform:uppercase;
 letter-spacing:.04em;
 margin-bottom:5px;
 }
-.field input, .field select{
+.field input{
 width:100%;
 max-width:100%;
 padding:10px 11px;
@@ -196,15 +184,9 @@ color:var(--ink);
 appearance:none;
 box-sizing:border-box;
 }
-.field select{
-background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A5C6E' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-background-repeat:no-repeat;
-background-position:right 12px center;
-padding-right:30px;
-}
 .field input[type="date"]{ text-align:left; min-height:0; }
 .field input[type="date"]::-webkit-date-and-time-value{ text-align:left; }
-.field input:focus, .field select:focus{ outline:2px solid var(--rose); outline-offset:1px; }
+.field input:focus{ outline:2px solid var(--rose); outline-offset:1px; }
 .row2{ display:flex; gap:10px; }
 .row2 .field{ flex:1; }
 .primary-btn{
@@ -300,6 +282,21 @@ animation:fabPulse 2.2s ease-out infinite;
 100%{ transform:scale(1.35); opacity:0; }
 }
 .fab:active{ transform:scale(.94); }
+.fab-tag{
+position:fixed;
+bottom:88px;
+right:18px;
+z-index:50;
+background:var(--ink);
+color:#fff;
+font-family:'Space Mono',monospace;
+font-size:10.5px;
+letter-spacing:.04em;
+padding:5px 9px;
+border-radius:8px;
+opacity:.85;
+pointer-events:none;
+}
 
 /* ── Modal ── */
 .modal-overlay{
@@ -458,7 +455,7 @@ z-index:999;
 
 <p class="eyebrow">Just the two of you</p>
 <h1>Date Budget</h1>
-<p class="sub">One pooled budget for dating activities — log what you spend against it.</p>
+<p class="sub">One pooled budget for dating activities. Tap 🎡 if you need inspiration.</p>
 
 <div class="banner" id="storageBanner">⚠ Saving isn't available right now — changes will be lost on refresh.</div>
 
@@ -482,19 +479,9 @@ z-index:999;
 </div>
 </div>
 
-<!-- CATEGORY BREAKDOWN -->
-<div id="catBreakdownWrap" style="display:none;">
-<div class="section-title first">By category</div>
-<div class="form-card" id="catBreakdownList"></div>
-</div>
-
 <!-- ADD EXPENSE -->
 <div class="section-title first" id="expenseSection">Log an expense</div>
 <div class="form-card">
-<div class="field">
-<label for="expCat">Category</label>
-<select id="expCat"></select>
-</div>
 <div class="row2">
 <div class="field" style="flex:2;">
 <label for="expItem">Item</label>
@@ -770,7 +757,7 @@ if(spinModal.classList.contains('visible')) resizeWheel();
 });
 </script>
 
-<!-- BUDGET + CATEGORIES + FIRESTORE SYNC -->
+<!-- BUDGET + FIRESTORE SYNC -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -786,12 +773,8 @@ const firebaseConfig = {
   measurementId: "G-N7NB6Q9TRH"
 };
 
-const DEFAULT_CATEGORIES = ["Food", "Place", "Shopping"];
-const ADD_NEW_VALUE = "__add_new__";
-
 let budget = 0;
 let expenses = [];
-let categories = [...DEFAULT_CATEGORIES];
 let docRef = null;
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -810,7 +793,7 @@ document.getElementById('storageBanner').style.display = 'none';
 async function writeData(){
 if(!docRef) return;
 try{
-await setDoc(docRef, { budget, expenses, categories }, { merge: true });
+await setDoc(docRef, { budget, expenses }, { merge: true });
 }catch(e){
 showBanner('⚠ Could not sync — check your connection.');
 }
@@ -820,7 +803,6 @@ async function init(){
 document.getElementById('expDate').value = todayStr();
 document.getElementById('editAllocBtn').addEventListener('click', editBudget);
 document.getElementById('addExpBtn').addEventListener('click', addExpense);
-document.getElementById('expCat').addEventListener('change', handleCategoryChange);
 
 try{
 const app = initializeApp(firebaseConfig);
@@ -833,14 +815,12 @@ if(snap.exists()){
 const data = snap.data();
 budget = typeof data.budget === 'number' ? data.budget : 0;
 expenses = Array.isArray(data.expenses) ? data.expenses : [];
-categories = (Array.isArray(data.categories) && data.categories.length > 0) ? data.categories : [...DEFAULT_CATEGORIES];
 renderAll();
 } else {
 const val = prompt('Set your monthly dating budget (RM):', '500');
 const num = parseFloat(val);
 budget = (!isNaN(num) && num >= 0) ? num : 0;
 expenses = [];
-categories = [...DEFAULT_CATEGORIES];
 renderAll();
 writeData();
 }
@@ -855,8 +835,6 @@ renderAll();
 
 function renderAll(){
 renderSummary();
-renderCategorySelect();
-renderCategoryBreakdown();
 renderExpenses();
 }
 
@@ -878,37 +856,6 @@ remEl.textContent = fmt(remaining);
 remEl.style.color = remaining < 0 ? 'var(--red)' : 'var(--rose-deep)';
 }
 
-function renderCategorySelect(){
-const sel = document.getElementById('expCat');
-const current = sel.value;
-sel.innerHTML = categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('')
-+ `<option value="${ADD_NEW_VALUE}">+ Add category</option>`;
-if(categories.includes(current)){
-sel.value = current;
-}
-}
-
-function renderCategoryBreakdown(){
-const wrap = document.getElementById('catBreakdownWrap');
-const list = document.getElementById('catBreakdownList');
-if(expenses.length === 0){ wrap.style.display = 'none'; return; }
-
-const totals = {};
-expenses.forEach(x => {
-const c = x.category || 'Other';
-totals[c] = (totals[c] || 0) + x.amount;
-});
-const rows = Object.entries(totals).sort((a,b) => b[1] - a[1]);
-
-list.innerHTML = rows.map(([name, amt]) => `
-<div class="cat-row">
-<span class="cat-name">${escapeHtml(name)}</span>
-<span class="cat-amt">${fmt(amt)}</span>
-</div>
-`).join('');
-wrap.style.display = 'block';
-}
-
 function renderExpenses(){
 const list = document.getElementById('expenseList');
 const empty = document.getElementById('expEmpty');
@@ -925,7 +872,7 @@ row.className = 'expense-row';
 row.innerHTML = `
 <div class="exp-left">
 <div class="exp-item">${escapeHtml(exp.item)}</div>
-<div class="exp-meta">${exp.date} · ${escapeHtml(exp.category || 'Other')}</div>
+<div class="exp-meta">${exp.date}</div>
 </div>
 <div class="exp-right">
 <span class="exp-amt">${fmt(exp.amount)}</span>
@@ -950,35 +897,15 @@ renderAll();
 writeData();
 }
 
-function handleCategoryChange(e){
-const sel = e.target;
-if(sel.value !== ADD_NEW_VALUE) return;
-const name = prompt('New category name:');
-const trimmed = (name || '').trim();
-if(!trimmed){
-sel.value = categories[0] || '';
-return;
-}
-const exists = categories.some(c => c.toLowerCase() === trimmed.toLowerCase());
-if(!exists){
-categories.push(trimmed);
-writeData();
-}
-renderCategorySelect();
-sel.value = exists ? categories.find(c => c.toLowerCase() === trimmed.toLowerCase()) : trimmed;
-}
-
 async function addExpense(){
-const catEl = document.getElementById('expCat');
 const itemEl = document.getElementById('expItem');
 const amtEl = document.getElementById('expAmt');
 const dateEl = document.getElementById('expDate');
-const category = catEl.value === ADD_NEW_VALUE ? (categories[0] || 'Other') : catEl.value;
 const item = itemEl.value.trim();
 const amount = parseFloat(amtEl.value);
 const date = dateEl.value || todayStr();
 if(!item || isNaN(amount) || amount <= 0) return;
-expenses.push({ id: uid(), item, amount, date, category, createdAt: Date.now() });
+expenses.push({ id: uid(), item, amount, date, createdAt: Date.now() });
 itemEl.value=''; amtEl.value='';
 renderAll();
 writeData();
@@ -991,7 +918,7 @@ writeData();
 }
 
 function escapeHtml(s){
-return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
 init();
